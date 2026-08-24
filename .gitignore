@@ -1,0 +1,89 @@
+# ==========================================
+# JobTrack - Root .gitignore
+# ==========================================
+
+
+# ==========================================
+# IDE / Editor
+# ==========================================
+
+# Eclipse
+.metadata/
+.classpath
+.project
+.settings/
+.factorypath
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+
+# ==========================================
+# Operating System Files
+# ==========================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ==========================================
+# Backend - Spring Boot / Java
+# ==========================================
+
+jobtrack-backend/target/
+*.class
+
+# Logs
+*.log
+logs/
+
+
+# ==========================================
+# Environment Variables / Secrets
+# ==========================================
+
+.env
+.env.*
+!.env.example
+
+# Local Spring configuration
+application-local.properties
+application-local.yml
+
+
+# ==========================================
+# Frontend - React / Node
+# ==========================================
+
+jobtrack-frontend/node_modules/
+jobtrack-frontend/dist/
+jobtrack-frontend/build/
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# ==========================================
+# Test / Coverage
+# ==========================================
+
+coverage/
+.nyc_output/
+
+
+# ==========================================
+# Temporary Files
+# ==========================================
+
+*.tmp
+*.temp
+*.swp
+*.swo
