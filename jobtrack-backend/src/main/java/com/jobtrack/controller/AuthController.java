@@ -15,16 +15,20 @@ import com.jobtrack.service.EmailService;
 import jakarta.validation.Valid;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     private final UserRepository userRepository;
 
@@ -164,9 +168,12 @@ public class AuthController {
         userRepository.save(user);
 
         // Create reset link
-        String resetLink =
-                "http://localhost:5173/reset-password?token="
-                        + resetToken;
+        String resetLink = UriComponentsBuilder.fromUriString(frontendUrl)
+                .path("/reset-password")
+                .queryParam("token", resetToken)
+                .build()
+                .encode()
+                .toUriString();
 
         // Send email
         emailService.sendPasswordResetEmail(

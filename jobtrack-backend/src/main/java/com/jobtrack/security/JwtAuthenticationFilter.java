@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token =
                 authorizationHeader.substring(7);
 
-        if (jwtService.isTokenValid(token)) {
+        if (jwtService.isAccessToken(token)) {
 
             String email =
                     jwtService.extractEmail(token);

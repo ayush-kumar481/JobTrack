@@ -19,115 +19,103 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        @Value("${app.cors.allowed-origins}")
+        private String[] allowedOrigins;
 
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter) {
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
+        public SecurityConfig(
+                        JwtAuthenticationFilter jwtAuthenticationFilter) {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-        http
-                // Disable CSRF because we are using JWT authentication
-                .csrf(csrf -> csrf.disable())
+        @Bean
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http) throws Exception {
 
-                // Enable CORS
-                .cors(cors -> cors.configurationSource(
-                        corsConfigurationSource()
-                ))
+                http
+                                // Disable CSRF because we are using JWT authentication
+                                .csrf(csrf -> csrf.disable())
 
-                // No server-side sessions
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
+                                // Enable CORS
+                                .cors(cors -> cors.configurationSource(
+                                                corsConfigurationSource()))
 
-                .authorizeHttpRequests(auth -> auth
+                                // No server-side sessions
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
 
-                        // Allow CORS preflight requests
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
+                                .authorizeHttpRequests(auth -> auth
 
-                        // Allow all authentication endpoints
-                     // Public authentication endpoints
-                        .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/auth/forgot-password",
-                                "/api/auth/reset-password"
-                        )
-                        .permitAll()
+                                                // Allow CORS preflight requests
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                                                .permitAll()
 
-                        // Everything else requires authentication
-                        .anyRequest()
-                        .authenticated()
-                )
+                                                // Allow all authentication endpoints
+                                                // Public authentication endpoints
+                                                .requestMatchers(
+                                                                "/api/auth/login",
+                                                                "/api/auth/register",
+                                                                "/api/auth/forgot-password",
+                                                                "/api/auth/reset-password")
+                                                .permitAll()
 
-                // JWT filter
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
+                                                // Everything else requires authentication
+                                                .anyRequest()
+                                                .authenticated())
 
-                // Disable default authentication
-                .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form.disable());
+                                // JWT filter
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class)
 
-        return http.build();
-    }
+                                // Disable default authentication
+                                .httpBasic(basic -> basic.disable())
+                                .formLogin(form -> form.disable());
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+                return http.build();
+        }
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
-        );
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedMethods(
-                List.of(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "DELETE",
-                        "OPTIONS"
-                )
-        );
+                configuration.setAllowedOrigins(List.of(allowedOrigins));
 
-        configuration.setAllowedHeaders(
-                List.of(
-                        "Authorization",
-                        "Content-Type",
-                        "Accept"
-                )
-        );
+                configuration.setAllowedMethods(
+                                List.of(
+                                                "GET",
+                                                "POST",
+                                                "PUT",
+                                                "DELETE",
+                                                "OPTIONS"));
 
-        configuration.setAllowCredentials(true);
+                configuration.setAllowedHeaders(
+                                List.of(
+                                                "Authorization",
+                                                "Content-Type",
+                                                "Accept"));
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+                configuration.setAllowCredentials(true);
 
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        return source;
-    }
+                source.registerCorsConfiguration(
+                                "/**",
+                                configuration);
+
+                return source;
+        }
 }
